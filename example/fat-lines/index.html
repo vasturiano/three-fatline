@@ -35,7 +35,7 @@
 
 <script src="//unpkg.com/three"></script>
 <script src="//unpkg.com/three/examples/js/controls/OrbitControls.js"></script>
-<script src="//unpkg.com/three/examples/js/geometries/hilbert3D.js"></script>
+<script src="//unpkg.com/three/examples/js/utils/GeometryUtils.js"></script>
 <script src="//unpkg.com/three/examples/js/WebGL.js"></script>
 <script src="//unpkg.com/three/examples/js/libs/stats.min.js"></script>
 <script src="//unpkg.com/three/examples/js/libs/dat.gui.min.js"></script>
@@ -90,7 +90,7 @@
     var positions = [];
     var colors = [];
 
-    var points = hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
+    var points = THREE.GeometryUtils.hilbert3D( new THREE.Vector3( 0, 0, 0 ), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7 );
 
     var spline = new THREE.CatmullRomCurve3( points );
     var divisions = Math.round( 12 * points.length );
