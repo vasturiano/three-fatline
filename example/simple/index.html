@@ -1,0 +1,78 @@
+<head>
+  <style>body { margin: 0; }</style>
+
+  <script src="//unpkg.com/three"></script>
+  <script src="//unpkg.com/three/examples/js/controls/OrbitControls.js"></script>
+  <script src="//unpkg.com/three/examples/js/utils/GeometryUtils.js"></script>
+
+  <script src="//unpkg.com/three-fatline"></script>
+  <!--<script src="../../dist/three-fatline.js"></script>-->
+</head>
+
+<body>
+  <script>
+    { // renderer init
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setPixelRatio(window.devicePixelRatio);
+      renderer.setClearColor(0x000000, 0);
+      document.body.appendChild(renderer.domElement);
+
+      const scene = new THREE.Scene();
+      scene.add(genFatLine());
+
+      const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 1000);
+      camera.position.set(-40, 0, 60);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.minDistance = 10;
+      controls.maxDistance = 500;
+
+      (function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+      })(); // IIFE
+    }
+
+    //
+
+    function genFatLine() {
+      // Position and Color Data
+      const positions = [];
+      const colors = [];
+
+      const points = THREE.GeometryUtils.hilbert3D(new THREE.Vector3(0, 0, 0), 20.0, 1, 0, 1, 2, 3, 4, 5, 6, 7);
+
+      const spline = new THREE.CatmullRomCurve3(points);
+      const divisions = Math.round(12 * points.length);
+      const color = new THREE.Color();
+
+      for (let i = 0, l = divisions; i < l; i ++) {
+        const point = spline.getPoint(i / l);
+        positions.push(point.x, point.y, point.z);
+
+        color.setHSL(i / l, 1.0, 0.5);
+        colors.push(color.r, color.g, color.b);
+      }
+
+      const geometry = new THREE.LineGeometry();
+      geometry.setPositions( positions );
+      geometry.setColors( colors );
+
+      const matLine = new THREE.LineMaterial({
+        color: 0xffffff,
+        linewidth: 5, // in pixels
+        vertexColors: THREE.VertexColors,
+        dashed: false,
+        resolution: new THREE.Vector2(window.innerWidth, window.innerHeight) // resolution of the viewport
+      });
+
+      const line = new THREE.Line2(geometry, matLine);
+      line.computeLineDistances();
+      line.scale.set(1, 1, 1);
+
+      return line;
+    }
+
+  </script>
+</body>
