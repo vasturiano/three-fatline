@@ -1,26 +1,20 @@
-// from https://github.com/mrdoob/three.js/blob/master/examples/js/lines/LineGeometry.js
-
-const THREE = window.THREE
-	? window.THREE // Prefer consumption from global THREE, if exists
-	: {};
-
-import LineSegmentsGeometry from './LineSegmentsGeometry';
-Object.assign(THREE, { LineSegmentsGeometry });
-
 /**
  * @author WestLangley / http://github.com/WestLangley
  *
  */
 
-const LineGeometry = function () {
 
-	THREE.LineSegmentsGeometry.call( this );
+import LineSegmentsGeometry from "./LineSegmentsGeometry.js";
+
+var LineGeometry = function () {
+
+	LineSegmentsGeometry.call( this );
 
 	this.type = 'LineGeometry';
 
 };
 
-LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsGeometry.prototype ), {
+LineGeometry.prototype = Object.assign( Object.create( LineSegmentsGeometry.prototype ), {
 
 	constructor: LineGeometry,
 
@@ -45,7 +39,7 @@ LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsGeometr
 
 		}
 
-		THREE.LineSegmentsGeometry.prototype.setPositions.call( this, points );
+		LineSegmentsGeometry.prototype.setPositions.call( this, points );
 
 		return this;
 
@@ -70,7 +64,7 @@ LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsGeometr
 
 		}
 
-		THREE.LineSegmentsGeometry.prototype.setColors.call( this, colors );
+		LineSegmentsGeometry.prototype.setColors.call( this, colors );
 
 		return this;
 
@@ -96,7 +90,7 @@ LineGeometry.prototype = Object.assign( Object.create( THREE.LineSegmentsGeometr
 
 	},
 
-	copy: function ( source ) {
+	copy: function ( /* source */ ) {
 
 		// todo
 

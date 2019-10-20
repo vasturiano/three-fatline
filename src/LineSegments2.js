@@ -1,4 +1,7 @@
-// from https://github.com/mrdoob/three.js/blob/master/examples/js/lines/LineSegments2.js
+/**
+ * @author WestLangley / http://github.com/WestLangley
+ *
+ */
 
 import {
 	InstancedInterleavedBuffer,
@@ -10,29 +13,23 @@ import {
 const THREE = window.THREE
 	? window.THREE // Prefer consumption from global THREE, if exists
 	: {
-		InstancedInterleavedBuffer,
-		InterleavedBufferAttribute,
-		Mesh,
-		Vector3
-	};
+	InstancedInterleavedBuffer,
+	InterleavedBufferAttribute,
+	Mesh,
+	Vector3
+};
 
-import LineMaterial from './LineMaterial';
-import LineSegmentsGeometry from './LineSegmentsGeometry';
-Object.assign(THREE, { LineMaterial, LineSegmentsGeometry });
+import LineSegmentsGeometry from "./LineSegmentsGeometry.js";
+import LineMaterial from "./LineMaterial.js";
 
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
-const LineSegments2 = function ( geometry, material ) {
+var LineSegments2 = function ( geometry, material ) {
 
 	THREE.Mesh.call( this );
 
 	this.type = 'LineSegments2';
 
-	this.geometry = geometry !== undefined ? geometry : new THREE.LineSegmentsGeometry();
-	this.material = material !== undefined ? material : new THREE.LineMaterial( { color: Math.random() * 0xffffff } );
+	this.geometry = geometry !== undefined ? geometry : new LineSegmentsGeometry();
+	this.material = material !== undefined ? material : new LineMaterial( { color: Math.random() * 0xffffff } );
 
 };
 
@@ -76,7 +73,7 @@ LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), 
 
 	}() ),
 
-	copy: function ( source ) {
+	copy: function ( /* source */ ) {
 
 		// todo
 

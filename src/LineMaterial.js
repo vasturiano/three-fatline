@@ -1,23 +1,3 @@
-// from https://github.com/mrdoob/three.js/blob/master/examples/js/lines/LineMaterial.js
-
-import {
-	ShaderLib,
-	ShaderMaterial,
-	UniformsLib,
-	UniformsUtils,
-	Vector2
-} from 'three';
-
-const THREE = window.THREE
-	? window.THREE // Prefer consumption from global THREE, if exists
-	: {
-		ShaderLib,
-		ShaderMaterial,
-		UniformsLib,
-		UniformsUtils,
-		Vector2
-	};
-
 /**
  * @author WestLangley / http://github.com/WestLangley
  *
@@ -32,10 +12,28 @@ const THREE = window.THREE
  * }
  */
 
+import {
+	ShaderLib,
+	ShaderMaterial,
+	UniformsLib,
+	UniformsUtils,
+	Vector2
+} from 'three';
+
+const THREE = window.THREE
+	? window.THREE // Prefer consumption from global THREE, if exists
+	: {
+	ShaderLib,
+	ShaderMaterial,
+	UniformsLib,
+	UniformsUtils,
+	Vector2
+};
+
 THREE.UniformsLib.line = {
 
 	linewidth: { value: 1 },
-	resolution: { value: new THREE.Vector2( 1, 1 ) },
+	resolution: { value: new Vector2( 1, 1 ) },
 	dashScale: { value: 1 },
 	dashSize: { value: 1 },
 	gapSize: { value: 1 } // todo FIX - maybe change to totalSize
@@ -257,7 +255,7 @@ THREE.ShaderLib[ 'line' ] = {
 		`
 };
 
-const LineMaterial = function ( parameters ) {
+var LineMaterial = function ( parameters ) {
 
 	THREE.ShaderMaterial.call( this, {
 
@@ -408,5 +406,6 @@ LineMaterial.prototype.copy = function ( source ) {
 	return this;
 
 };
+
 
 export default LineMaterial;

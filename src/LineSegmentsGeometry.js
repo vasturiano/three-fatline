@@ -1,8 +1,10 @@
-// from https://github.com/mrdoob/three.js/blob/master/examples/js/lines/LineSegmentsGeometry.js
+/**
+ * @author WestLangley / http://github.com/WestLangley
+ *
+ */
 
 import {
 	Box3,
-	BufferGeometry,
 	Float32BufferAttribute,
 	InstancedBufferGeometry,
 	InstancedInterleavedBuffer,
@@ -15,29 +17,21 @@ import {
 const THREE = window.THREE
 	? window.THREE // Prefer consumption from global THREE, if exists
 	: {
-		Box3,
-		BufferGeometry,
-		Float32BufferAttribute,
-		InstancedBufferGeometry,
-		InstancedInterleavedBuffer,
-		InterleavedBufferAttribute,
-		Sphere,
-		Vector3,
-		WireframeGeometry
-	};
+	Box3,
+	Float32BufferAttribute,
+	InstancedBufferGeometry,
+	InstancedInterleavedBuffer,
+	InterleavedBufferAttribute,
+	Sphere,
+	Vector3,
+	WireframeGeometry
+};
 
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
-const LineSegmentsGeometry = function () {
+var LineSegmentsGeometry = function () {
 
 	THREE.InstancedBufferGeometry.call( this );
 
 	this.type = 'LineSegmentsGeometry';
-
-	var plane = new THREE.BufferGeometry();
 
 	var positions = [ - 1, 2, 0, 1, 2, 0, - 1, 1, 0, 1, 1, 0, - 1, 0, 0, 1, 0, 0, - 1, - 1, 0, 1, - 1, 0 ];
 	var uvs = [ - 1, 2, 1, 2, - 1, 1, 1, 1, - 1, - 1, 1, - 1, - 1, - 2, 1, - 2 ];
@@ -255,7 +249,7 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.InstancedBu
 
 				if ( isNaN( this.boundingSphere.radius ) ) {
 
-					console.error( 'LineSegmentsGeometry.computeBoundingSphere(): Computed radius is NaN. The instanced position data is likely to have NaN values.', this );
+					console.error( 'THREE.LineSegmentsGeometry.computeBoundingSphere(): Computed radius is NaN. The instanced position data is likely to have NaN values.', this );
 
 				}
 
@@ -277,7 +271,7 @@ LineSegmentsGeometry.prototype = Object.assign( Object.create( THREE.InstancedBu
 
 	},
 
-	copy: function ( source ) {
+	copy: function ( /* source */ ) {
 
 		// todo
 
