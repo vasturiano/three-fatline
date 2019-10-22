@@ -63,13 +63,20 @@
         color: 0xffffff,
         linewidth: 5, // in pixels
         vertexColors: THREE.VertexColors,
-        dashed: false,
+        dashed: true,
+        dashScale: 2,
+        dashSize: 2,
+        gapSize: 1,
         resolution: new THREE.Vector2(window.innerWidth, window.innerHeight) // resolution of the viewport
       });
 
+      // temp hack to activate line dash
+      matLine.defines.USE_DASH = "";
+
       const line = new THREE.Line2(geometry, matLine);
+
+      // required for dashed lines
       line.computeLineDistances();
-      line.scale.set(1, 1, 1);
 
       return line;
     }

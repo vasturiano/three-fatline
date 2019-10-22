@@ -24,6 +24,8 @@ const material = new LineMaterial({
 });
 
 const myLine = new Line2(geometry, matLine);
+
+myLine.computeLineDistances();
 ```
 
 [npm-img]: https://img.shields.io/npm/v/three-fatline.svg
