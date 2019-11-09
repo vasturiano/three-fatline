@@ -38,7 +38,7 @@
   },
   "dependencies": {},
   "peerDependencies": {
-    "three": "*"
+    "three": ">=0.110.0"
   },
   "devDependencies": {
     "@babel/core": "^7.7.2",
