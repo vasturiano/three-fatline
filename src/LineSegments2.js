@@ -4,6 +4,7 @@
  */
 
 import {
+	BufferGeometry,
 	InstancedInterleavedBuffer,
 	InterleavedBufferAttribute,
 	Mesh,
@@ -13,6 +14,7 @@ import {
 const THREE = window.THREE
 	? window.THREE // Prefer consumption from global THREE, if exists
 	: {
+	BufferGeometry,
 	InstancedInterleavedBuffer,
 	InterleavedBufferAttribute,
 	Mesh,
@@ -21,6 +23,9 @@ const THREE = window.THREE
 
 import LineSegmentsGeometry from "./LineSegmentsGeometry.js";
 import LineMaterial from "./LineMaterial.js";
+
+// support both modes for backwards threejs compatibility
+var setAttributeFn = new THREE.BufferGeometry().setAttribute ? 'setAttribute' : 'addAttribute';
 
 var LineSegments2 = function ( geometry, material ) {
 
@@ -64,8 +69,8 @@ LineSegments2.prototype = Object.assign( Object.create( THREE.Mesh.prototype ), 
 
 			var instanceDistanceBuffer = new THREE.InstancedInterleavedBuffer( lineDistances, 2, 1 ); // d0, d1
 
-			geometry.setAttribute( 'instanceDistanceStart', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
-			geometry.setAttribute( 'instanceDistanceEnd', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
+			geometry[setAttributeFn]( 'instanceDistanceStart', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 0 ) ); // d0
+			geometry[setAttributeFn]( 'instanceDistanceEnd', new THREE.InterleavedBufferAttribute( instanceDistanceBuffer, 1, 1 ) ); // d1
 
 			return this;
 
