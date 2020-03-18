@@ -15,7 +15,7 @@ export interface LineMaterialParameters extends MaterialParameters {
 	resolution?: Vector2;
 }
 
-export class LineMaterial extends ShaderMaterial {
+export declare class LineMaterial extends ShaderMaterial {
 
 	constructor( parameters?: LineMaterialParameters );
 	color: Color;

@@ -7,7 +7,7 @@ import {
 	WireframeGeometry
 } from 'three';
 
-export class LineSegmentsGeometry extends InstancedBufferGeometry {
+export declare class LineSegmentsGeometry extends InstancedBufferGeometry {
 
 	constructor();
 	isLineSegmentsGeometry: boolean;
