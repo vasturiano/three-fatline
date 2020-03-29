@@ -13,6 +13,7 @@ export declare class LineSegmentsGeometry extends InstancedBufferGeometry {
 	isLineSegmentsGeometry: boolean;
 
 	applyMatrix( matrix: Matrix4 ): this;
+	applyMatrix4( matrix: Matrix4 ): this;
 	computeBoundingBox(): void;
 	computeBoundingSphere(): void;
 	fromEdgesGeometry( geometry: WireframeGeometry ): this;
