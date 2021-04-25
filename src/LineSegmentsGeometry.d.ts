@@ -8,19 +8,16 @@ import {
 } from 'three';
 
 export declare class LineSegmentsGeometry extends InstancedBufferGeometry {
-
 	constructor();
-	isLineSegmentsGeometry: boolean;
+	readonly isLineSegmentsGeometry: true;
 
-	applyMatrix( matrix: Matrix4 ): this;
-	applyMatrix4( matrix: Matrix4 ): this;
+	applyMatrix4(matrix: Matrix4): this;
 	computeBoundingBox(): void;
 	computeBoundingSphere(): void;
-	fromEdgesGeometry( geometry: WireframeGeometry ): this;
-	fromLineSegements( lineSegments: LineSegments ): this;
-	fromMesh( mesh: Mesh ): this;
-	fromWireframeGeometry( geometry: EdgesGeometry ): this;
-	setColors( array: number[] | Float32Array ): this;
-	setPositions( array: number[] | Float32Array ): this;
-
+	fromEdgesGeometry(geometry: WireframeGeometry): this;
+	fromLineSegments(lineSegments: LineSegments): this;
+	fromMesh(mesh: Mesh): this;
+	fromWireframeGeometry(geometry: EdgesGeometry): this;
+	setColors(array: number[] | Float32Array): this;
+	setPositions(array: number[] | Float32Array): this;
 }

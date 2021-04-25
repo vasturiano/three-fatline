@@ -1,38 +1,20 @@
-/**
- * @author WestLangley / http://github.com/WestLangley
- *
- */
-
-
 import LineSegments2 from "./LineSegments2.js";
 import LineGeometry from "./LineGeometry.js";
 import LineMaterial from "./LineMaterial.js";
 
-var Line2 = function ( geometry, material ) {
+class Line2 extends LineSegments2 {
 
-	LineSegments2.call( this );
+	constructor( geometry = new LineGeometry(), material = new LineMaterial( {
+		color: Math.random() * 0xffffff
+	} ) ) {
 
-	this.type = 'Line2';
-
-	this.geometry = geometry !== undefined ? geometry : new LineGeometry();
-	this.material = material !== undefined ? material : new LineMaterial( { color: Math.random() * 0xffffff } );
-
-};
-
-Line2.prototype = Object.assign( Object.create( LineSegments2.prototype ), {
-
-	constructor: Line2,
-
-	isLine2: true,
-
-	copy: function ( /* source */ ) {
-
-		// todo
-
-		return this;
+		super( geometry, material );
+		this.type = 'Line2';
 
 	}
 
-} );
+}
+
+Line2.prototype.isLine2 = true;
 
 export default Line2;

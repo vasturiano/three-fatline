@@ -17,8 +17,7 @@ export interface LineMaterialParameters extends MaterialParameters {
 }
 
 export declare class LineMaterial extends ShaderMaterial {
-
-	constructor( parameters?: LineMaterialParameters );
+	constructor(parameters?: LineMaterialParameters);
 	color: Color;
 	dashed: boolean;
 	dashScale: number;
@@ -29,5 +28,5 @@ export declare class LineMaterial extends ShaderMaterial {
 	readonly isLineMaterial: true;
 	linewidth: number;
 	resolution: Vector2;
-
+	alphaToCoverage: boolean;
 }
