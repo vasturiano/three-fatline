@@ -1,6 +1,6 @@
 {
   "name": "three-fatline",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "A ThreeJS Line object with variable width",
   "unpkg": "dist/three-fatline.min.js",
   "main": "dist/three-fatline.common.js",
