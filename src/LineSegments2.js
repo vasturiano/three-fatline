@@ -212,8 +212,8 @@ class LineSegments2 extends THREE.Mesh {
 
 			_end4.fromBufferAttribute( instanceEnd, i );
 
-			_start.w = 1;
-			_end.w = 1; // camera space
+			_start4.w = 1;
+			_end4.w = 1; // camera space
 
 			_start4.applyMatrix4( _mvMatrix );
 

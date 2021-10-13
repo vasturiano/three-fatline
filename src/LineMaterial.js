@@ -5,7 +5,6 @@
  *  dashed: <boolean>,
  *  dashScale: <float>,
  *  dashSize: <float>,
- *  dashOffset: <float>,
  *  gapSize: <float>,
  *  resolution: <Vector2>, // to be set by renderer
  * }
@@ -30,26 +29,30 @@ const THREE = window.THREE
 };
 
 THREE.UniformsLib.line = {
-
-	linewidth: { value: 1 },
-	resolution: { value: new Vector2( 1, 1 ) },
-	dashScale: { value: 1 },
-	dashSize: { value: 1 },
-	dashOffset: { value: 0 },
-	gapSize: { value: 1 }, // todo FIX - maybe change to totalSize
-	opacity: { value: 1 }
+		worldUnits: {
+			value: 1
+		},
+		linewidth: {
+			value: 1
+		},
+		resolution: {
+			value: new THREE.Vector2( 1, 1 )
+		},
+		dashScale: {
+			value: 1
+		},
+		dashSize: {
+			value: 1
+		},
+		gapSize: {
+			value: 1
+		} // todo FIX - maybe change to totalSize
 
 };
-
 THREE.ShaderLib[ 'line' ] = {
-
-	uniforms: THREE.UniformsUtils.merge( [
-		THREE.UniformsLib.common,
-		THREE.UniformsLib.fog,
-		THREE.UniformsLib.line
-	] ),
-
+		uniforms: THREE.UniformsUtils.merge( [ THREE.UniformsLib.common, THREE.UniformsLib.fog, THREE.UniformsLib.line ] ),
 	vertexShader:
+	/* glsl */
 		`
 		#include <common>
 		#include <color_pars_vertex>
@@ -67,6 +70,9 @@ THREE.ShaderLib[ 'line' ] = {
 		attribute vec3 instanceColorEnd;
 
 		varying vec2 vUv;
+		varying vec4 worldPos;
+		varying vec3 worldStart;
+		varying vec3 worldEnd;
 
 		#ifdef USE_DASH
 
@@ -114,6 +120,9 @@ THREE.ShaderLib[ 'line' ] = {
 			vec4 start = modelViewMatrix * vec4( instanceStart, 1.0 );
 			vec4 end = modelViewMatrix * vec4( instanceEnd, 1.0 );
 
+			worldStart = start.xyz;
+			worldEnd = end.xyz;
+
 			// special case for perspective projection, and segments that terminate either in, or behind, the camera plane
 			// clearly the gpu firmware has a way of addressing this issue when projecting into ndc space
 			// but we need to perform ndc-space calculations in the shader, so we must address this issue directly
@@ -140,19 +149,75 @@ THREE.ShaderLib[ 'line' ] = {
 			vec4 clipEnd = projectionMatrix * end;
 
 			// ndc space
-			vec2 ndcStart = clipStart.xy / clipStart.w;
-			vec2 ndcEnd = clipEnd.xy / clipEnd.w;
+			vec3 ndcStart = clipStart.xyz / clipStart.w;
+			vec3 ndcEnd = clipEnd.xyz / clipEnd.w;
 
 			// direction
-			vec2 dir = ndcEnd - ndcStart;
+			vec2 dir = ndcEnd.xy - ndcStart.xy;
 
 			// account for clip-space aspect ratio
 			dir.x *= aspect;
 			dir = normalize( dir );
 
-			// perpendicular to dir
-			vec2 offset = vec2( dir.y, - dir.x );
+			#ifdef WORLD_UNITS
 
+				// get the offset direction as perpendicular to the view vector
+				vec3 worldDir = normalize( end.xyz - start.xyz );
+				vec3 offset;
+				if ( position.y < 0.5 ) {
+
+					offset = normalize( cross( start.xyz, worldDir ) );
+
+				} else {
+
+					offset = normalize( cross( end.xyz, worldDir ) );
+
+				}
+
+				// sign flip
+				if ( position.x < 0.0 ) offset *= - 1.0;
+
+				float forwardOffset = dot( worldDir, vec3( 0.0, 0.0, 1.0 ) );
+
+				// don't extend the line if we're rendering dashes because we
+				// won't be rendering the endcaps
+				#ifndef USE_DASH
+
+					// extend the line bounds to encompass  endcaps
+					start.xyz += - worldDir * linewidth * 0.5;
+					end.xyz += worldDir * linewidth * 0.5;
+
+					// shift the position of the quad so it hugs the forward edge of the line
+					offset.xy -= dir * forwardOffset;
+					offset.z += 0.5;
+
+				#endif
+
+				// endcaps
+				if ( position.y > 1.0 || position.y < 0.0 ) {
+
+					offset.xy += dir * 2.0 * forwardOffset;
+
+				}
+
+				// adjust for linewidth
+				offset *= linewidth * 0.5;
+
+				// set the world position
+				worldPos = ( position.y < 0.5 ) ? start : end;
+				worldPos.xyz += offset;
+
+				// project the worldpos
+				vec4 clip = projectionMatrix * worldPos;
+
+				// shift the depth of the projected points so the line
+				// segements overlap neatly
+				vec3 clipPose = ( position.y < 0.5 ) ? ndcStart : ndcEnd;
+				clip.z = clipPose.z * clip.w;
+
+			#else
+
+			vec2 offset = vec2( dir.y, - dir.x );
 			// undo aspect ratio adjustment
 			dir.x /= aspect;
 			offset.x /= aspect;
@@ -185,6 +250,8 @@ THREE.ShaderLib[ 'line' ] = {
 
 			clip.xy += offset;
 
+			#endif
+
 			gl_Position = clip;
 
 			vec4 mvPosition = ( position.y < 0.5 ) ? start : end; // this is an approximation
@@ -195,21 +262,24 @@ THREE.ShaderLib[ 'line' ] = {
 
 		}
 		`,
-
 	fragmentShader:
+	/* glsl */
 		`
 		uniform vec3 diffuse;
 		uniform float opacity;
+		uniform float linewidth;
 
 		#ifdef USE_DASH
 
 			uniform float dashSize;
-			uniform float dashOffset;
 			uniform float gapSize;
 
 		#endif
 
 		varying float vLineDistance;
+		varying vec4 worldPos;
+		varying vec3 worldStart;
+		varying vec3 worldEnd;
 
 		#include <common>
 		#include <color_pars_fragment>
@@ -219,6 +289,35 @@ THREE.ShaderLib[ 'line' ] = {
 
 		varying vec2 vUv;
 
+		vec2 closestLineToLine(vec3 p1, vec3 p2, vec3 p3, vec3 p4) {
+
+			float mua;
+			float mub;
+
+			vec3 p13 = p1 - p3;
+			vec3 p43 = p4 - p3;
+
+			vec3 p21 = p2 - p1;
+
+			float d1343 = dot( p13, p43 );
+			float d4321 = dot( p43, p21 );
+			float d1321 = dot( p13, p21 );
+			float d4343 = dot( p43, p43 );
+			float d2121 = dot( p21, p21 );
+
+			float denom = d2121 * d4343 - d4321 * d4321;
+
+			float numer = d1343 * d4321 - d1321 * d4343;
+
+			mua = numer / denom;
+			mua = clamp( mua, 0.0, 1.0 );
+			mub = ( d1343 + d4321 * ( mua ) ) / d4343;
+			mub = clamp( mub, 0.0, 1.0 );
+
+			return vec2( mua, mub );
+
+		}
+
 		void main() {
 
 			#include <clipping_planes_fragment>
@@ -227,9 +326,61 @@ THREE.ShaderLib[ 'line' ] = {
 
 				if ( vUv.y < - 1.0 || vUv.y > 1.0 ) discard; // discard endcaps
 
-				if ( mod( vLineDistance + dashOffset, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
+				if ( mod( vLineDistance, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
 
 			#endif
+
+			float alpha = opacity;
+
+			#ifdef WORLD_UNITS
+
+				// Find the closest points on the view ray and the line segment
+				vec3 rayEnd = normalize( worldPos.xyz ) * 1e5;
+				vec3 lineDir = worldEnd - worldStart;
+				vec2 params = closestLineToLine( worldStart, worldEnd, vec3( 0.0, 0.0, 0.0 ), rayEnd );
+
+				vec3 p1 = worldStart + lineDir * params.x;
+				vec3 p2 = rayEnd * params.y;
+				vec3 delta = p1 - p2;
+				float len = length( delta );
+				float norm = len / linewidth;
+
+				#ifndef USE_DASH
+
+					#ifdef ALPHA_TO_COVERAGE
+
+						float dnorm = fwidth( norm );
+						alpha = 1.0 - smoothstep( 0.5 - dnorm, 0.5 + dnorm, norm );
+
+					#else
+
+						if ( norm > 0.5 ) {
+
+							discard;
+
+						}
+
+					#endif
+
+			#endif
+
+			#else
+
+				#ifdef ALPHA_TO_COVERAGE
+
+					// artifacts appear on some hardware if a derivative is taken within a conditional
+					float a = vUv.x;
+					float b = ( vUv.y > 0.0 ) ? vUv.y - 1.0 : vUv.y + 1.0;
+					float len2 = a * a + b * b;
+					float dlen = fwidth( len2 );
+
+					if ( abs( vUv.y ) > 1.0 ) {
+
+						alpha = 1.0 - smoothstep( 1.0 - dlen, 1.0 + dlen, len2 );
+
+					}
+
+				#else
 
 			if ( abs( vUv.y ) > 1.0 ) {
 
@@ -241,12 +392,16 @@ THREE.ShaderLib[ 'line' ] = {
 
 			}
 
-			vec4 diffuseColor = vec4( diffuse, opacity );
+				#endif
+
+			#endif
+
+			vec4 diffuseColor = vec4( diffuse, alpha );
 
 			#include <logdepthbuf_fragment>
 			#include <color_fragment>
 
-			gl_FragColor = vec4( diffuseColor.rgb, diffuseColor.a );
+			gl_FragColor = vec4( diffuseColor.rgb, alpha );
 
 			#include <tonemapping_fragment>
 			#include <encodings_fragment>
@@ -269,7 +424,6 @@ class LineMaterial extends THREE.ShaderMaterial {
 			clipping: true // required for clipping support
 
 		} );
-		this.dashed = false;
 		Object.defineProperties( this, {
 			color: {
 				enumerable: true,
@@ -281,6 +435,27 @@ class LineMaterial extends THREE.ShaderMaterial {
 				set: function ( value ) {
 
 					this.uniforms.diffuse.value = value;
+
+					}
+				},
+				worldUnits: {
+					enumerable: true,
+					get: function () {
+
+						return 'WORLD_UNITS' in this.defines;
+
+					},
+					set: function ( value ) {
+
+						if ( value === true ) {
+
+							this.defines.WORLD_UNITS = '';
+
+						} else {
+
+							delete this.defines.WORLD_UNITS;
+
+						}
 
 				}
 			},
@@ -296,6 +471,35 @@ class LineMaterial extends THREE.ShaderMaterial {
 					this.uniforms.linewidth.value = value;
 
 				}
+			},
+			dashed: {
+				enumerable: true,
+				get: function () {
+
+					return Boolean( 'USE_DASH' in this.defines );
+
+				},
+
+				set( value ) {
+
+					if ( Boolean( value ) !== Boolean( 'USE_DASH' in this.defines ) ) {
+
+						this.needsUpdate = true;
+
+					}
+
+					if ( value === true ) {
+
+						this.defines.USE_DASH = '';
+
+					} else {
+
+						delete this.defines.USE_DASH;
+
+					}
+
+				}
+
 			},
 			dashScale: {
 				enumerable: true,
@@ -390,7 +594,7 @@ class LineMaterial extends THREE.ShaderMaterial {
 
 					}
 
-					if ( value ) {
+					if ( value === true ) {
 
 						this.defines.ALPHA_TO_COVERAGE = '';
 						this.extensions.derivatives = true;

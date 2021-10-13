@@ -148,7 +148,7 @@ class LineSegmentsGeometry extends THREE.InstancedBufferGeometry {
 
 	}
 
-	romLineSegments( lineSegments ) {
+	fromLineSegments( lineSegments ) {
 
 		const geometry = lineSegments.geometry;
 
