@@ -215,7 +215,8 @@
       'width (px)': 5,
       'dashed': false,
       'dash scale': 1,
-      'dash / gap': 1
+      'dash / gap': 1,
+      'dash offset': 0
     };
 
 
@@ -300,6 +301,13 @@
           break;
 
       }
+
+    } );
+
+    gui.add( param, 'dash offset', 0, 3, 0.1 ).onChange( function ( val ) {
+
+      matLine.dashOffset = val;
+      matLineDashed.dashOffset = val;
 
     } );
 

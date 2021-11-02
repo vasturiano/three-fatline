@@ -5,6 +5,7 @@
  *  dashed: <boolean>,
  *  dashScale: <float>,
  *  dashSize: <float>,
+ *  dashOffset: <float>,
  *  gapSize: <float>,
  *  resolution: <Vector2>, // to be set by renderer
  * }
@@ -43,6 +44,9 @@ THREE.UniformsLib.line = {
 		},
 		dashSize: {
 			value: 1
+		},
+		dashOffset: {
+			value: 0
 		},
 		gapSize: {
 			value: 1
@@ -271,6 +275,7 @@ THREE.ShaderLib[ 'line' ] = {
 
 		#ifdef USE_DASH
 
+			uniform float dashOffset;
 			uniform float dashSize;
 			uniform float gapSize;
 
@@ -326,7 +331,7 @@ THREE.ShaderLib[ 'line' ] = {
 
 				if ( vUv.y < - 1.0 || vUv.y > 1.0 ) discard; // discard endcaps
 
-				if ( mod( vLineDistance, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
+				if ( mod( vLineDistance + dashOffset, dashSize + gapSize ) > dashSize ) discard; // todo - FIX
 
 			#endif
 
