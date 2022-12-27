@@ -1,9 +1,9 @@
 <head>
   <style>body { margin: 0; }</style>
 
-  <script src="//unpkg.com/three"></script>
-  <script src="//unpkg.com/three/examples/js/controls/OrbitControls.js"></script>
-  <script src="//unpkg.com/three/examples/js/utils/GeometryUtils.js"></script>
+  <script src="//unpkg.com/three@0.147"></script>
+  <script src="//unpkg.com/three@0.147/examples/js/controls/OrbitControls.js"></script>
+  <script src="//unpkg.com/three@0.147/examples/js/utils/GeometryUtils.js"></script>
 
   <script src="//unpkg.com/three-fatline"></script>
   <!--<script src="../../dist/three-fatline.js"></script>-->
@@ -62,7 +62,7 @@
       const matLine = new THREE.LineMaterial({
         color: 0xffffff,
         linewidth: 5, // in pixels
-        vertexColors: THREE.VertexColors,
+        vertexColors: true,
         dashed: true,
         dashScale: 2,
         dashSize: 2,
