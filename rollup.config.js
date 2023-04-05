@@ -1,7 +1,7 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonJs from '@rollup/plugin-commonjs';
 import babel from '@rollup/plugin-babel';
-import { terser } from "rollup-plugin-terser";
+import terser from "@rollup/plugin-terser";
 import dts from 'rollup-plugin-dts';
 
 import pkg from './package.json' assert { type: 'json' };
@@ -39,17 +39,12 @@ export default [
       babel({ exclude: 'node_modules/**' })
     ]
   },
-  { // commonJs and ES modules
+  { // ES module
     input: 'src/index.js',
     output: [
       {
-        format: 'cjs',
-        file: `dist/${name}.common.js`,
-        exports: 'auto'
-      },
-      {
         format: 'es',
-        file: `dist/${name}.module.js`
+        file: `dist/${name}.mjs`
       }
     ],
     external: [...Object.keys(dependencies || {}), ...Object.keys(peerDependencies || {})],
