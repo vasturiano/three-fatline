@@ -23,7 +23,7 @@ const material = new LineMaterial({
   // dashed, dashScale, dashSize, gapSize
 });
 
-const myLine = new Line2(geometry, matLine);
+const myLine = new Line2(geometry, material);
 
 myLine.computeLineDistances();
 ```
