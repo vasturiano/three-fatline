@@ -1,17 +1,21 @@
 <head>
   <style> body { margin: 0; }</style>
 
-  <script src="//unpkg.com/three"></script>
-  <script src="//unpkg.com/three-render-objects"></script>
+  <script type="module">
+    import * as THREE from '//unpkg.com/three/build/three.module.js';
+    window.THREE = { ...THREE };
+  </script>
 
-  <script src="//unpkg.com/three-fatline"></script>
-  <!--<script src="../../dist/three-fatline.js"></script>-->
+  <script src="//unpkg.com/three-render-objects" defer></script>
+
+  <script src="//unpkg.com/three-fatline" defer></script>
+  <!--<script src="../../dist/three-fatline.js" defer></script>-->
 </head>
 
 <body>
   <div id="myscene"></div>
 
-  <script>
+  <script type="module">
     const points = [
       new THREE.Vector3(-160, 200, 0),
       new THREE.Vector3(0, -200, 0),
